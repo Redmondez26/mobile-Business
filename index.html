@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1C1F26">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Mobile Business</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --charcoal:#1C1F26;
+    --charcoal-2:#262B35;
+    --steel:#2B4570;
+    --orange:#FF6B35;
+    --orange-dark:#D9541F;
+    --concrete:#F5F3EE;
+    --paper:#FFFFFF;
+    --ink:#1C1F26;
+    --slate:#5B6270;
+    --slate-light:#9CA3AF;
+    --line:#E3E0D8;
+    --success:#2F9E44;
+    --success-bg:#E5F5E9;
+    --warning:#C9821A;
+    --warning-bg:#FBF0DC;
+    --danger:#D33B3B;
+    --danger-bg:#FBE9E9;
+    --draft:#6B7280;
+    --draft-bg:#ECEBE5;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+  html,body{margin:0;padding:0;overflow-x:hidden;width:100%;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:#DEDBD1;
+    color:var(--ink);
+    min-height:100vh;
+    min-height:100dvh;
+    display:flex;
+    justify-content:center;
+    -webkit-text-size-adjust:100%;
+  }
+  #shell{
+    width:100%;
+    max-width:440px;
+    min-height:100vh;
+    min-height:100dvh;
+    background:var(--concrete);
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 0 40px rgba(0,0,0,0.15);
+    overflow-x:hidden;
+  }
+  .display{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:0.3px;}
+  .mono{font-family:'DM Mono',monospace;}
+
+  /* Header */
+  header.topbar{
+    background:var(--charcoal);
+    color:#fff;
+    padding:calc(18px + env(safe-area-inset-top)) 18px 16px;
+    position:sticky;
+    top:0;
+    z-index:20;
+  }
+  .brandrow{display:flex;align-items:center;justify-content:space-between;}
+  .brand{display:flex;align-items:baseline;gap:8px;}
+  .brand .mark{
+    background:var(--orange);
+    color:var(--charcoal);
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:700;
+    font-size:15px;
+    padding:2px 7px;
+    border-radius:4px;
+    letter-spacing:0.5px;
+  }
+  .brand .name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:0.5px;text-transform:uppercase;}
+  .screen-title{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:26px;margin:14px 0 2px;letter-spacing:0.3px;}
+  .screen-sub{font-size:13px;color:#B7BAC2;margin:0;}
+  .icon-btn{
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.15);
+    color:#fff;
+    width:44px;height:44px;
+    border-radius:9px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .icon-btn:active{transform:scale(0.95);}
+
+  main{flex:1;padding:16px 16px 96px;overflow-x:hidden;}
+
+  /* Bottom nav */
+  nav.tabbar{
+    position:sticky;
+    bottom:0;
+    background:var(--charcoal);
+    display:flex;
+    padding:8px 6px calc(10px + env(safe-area-inset-bottom));
+    border-top:1px solid #33394500;
+    z-index:20;
+  }
+  nav.tabbar button{
+    flex:1;
+    background:none;border:none;color:#8B90A0;
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    font-family:'Inter',sans-serif;font-size:10.5px;font-weight:600;
+    padding:8px 2px 6px;border-radius:10px;cursor:pointer;
+    letter-spacing:0.2px;
+    min-height:48px;
+  }
+  nav.tabbar button.active{color:var(--orange);background:rgba(255,107,53,0.12);}
+  nav.tabbar svg{width:21px;height:21px;}
+
+  /* Metric cards */
+  .metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+  .metric{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:13px 14px;}
+  .metric .label{font-size:11.5px;color:var(--slate);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;}
+  .metric .value{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:26px;margin-top:3px;}
+  .metric.wide{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;}
+
+  /* Section header */
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin:20px 0 10px;}
+  .section-head h3{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--charcoal);margin:0;}
+  .link-btn{background:none;border:none;color:var(--steel);font-size:12.5px;font-weight:600;cursor:pointer;padding:0;}
+
+  /* Invoice ticket card */
+  .ticket{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-left:3px dashed var(--slate-light);
+    border-radius:10px;
+    padding:13px 14px 13px 15px;
+    margin-bottom:10px;
+    position:relative;
+    cursor:pointer;
+  }
+  .ticket:active{background:#FBFAF7;}
+  .ticket-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .ticket-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--slate);}
+  .ticket-name{font-weight:600;font-size:15px;margin-top:2px;}
+  .ticket-meta{font-size:12px;color:var(--slate);margin-top:4px;}
+  .ticket-amt{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:19px;white-space:nowrap;}
+  .stamp{
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:700;
+    font-size:10.5px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    padding:2px 8px;
+    border-radius:5px;
+    border:1.5px solid currentColor;
+    transform:rotate(-5deg);
+    display:inline-block;
+    margin-top:6px;
+  }
+  .stamp.paid{color:var(--success);background:var(--success-bg);}
+  .stamp.sent{color:var(--steel);background:#E9EFF7;}
+  .stamp.draft{color:var(--draft);background:var(--draft-bg);}
+  .stamp.overdue{color:var(--danger);background:var(--danger-bg);}
+
+  .empty{
+    text-align:center;padding:40px 20px;color:var(--slate);
+  }
+  .empty svg{width:44px;height:44px;color:var(--slate-light);margin-bottom:10px;}
+  .empty p{font-size:13.5px;margin:2px 0;}
+  .empty .big{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;color:var(--ink);}
+
+  /* Buttons */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    font-family:'Inter',sans-serif;font-weight:600;font-size:14px;
+    padding:12px 16px;border-radius:10px;border:1px solid transparent;
+    cursor:pointer;width:100%;
+  }
+  .btn:active{transform:scale(0.98);}
+  .btn-primary{background:var(--orange);color:#fff;}
+  .btn-dark{background:var(--charcoal);color:#fff;}
+  .btn-outline{background:var(--paper);border:1px solid var(--line);color:var(--ink);}
+  .btn-ghost{background:none;border:1px solid var(--line);color:var(--slate);}
+  .btn-danger{background:var(--danger-bg);color:var(--danger);}
+  .btn-sm{padding:9px 12px;font-size:12.5px;width:auto;}
+  .row-btns{display:flex;gap:8px;}
+  .row-btns .btn{flex:1;}
+  .fab{
+    position:fixed;
+    max-width:440px;
+    margin:0 auto;
+    left:0;right:0;
+    bottom:calc(78px + env(safe-area-inset-bottom));
+    display:flex;justify-content:flex-end;
+    padding:0 16px;
+    pointer-events:none;
+  }
+  .fab button{
+    pointer-events:auto;
+    width:52px;height:52px;border-radius:50%;
+    background:var(--orange);color:#fff;border:none;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 16px rgba(255,107,53,0.4);
+    cursor:pointer;
+  }
+  .fab button:active{transform:scale(0.94);}
+
+  /* Forms */
+  label{display:block;font-size:12px;font-weight:600;color:var(--slate);margin:14px 0 5px;text-transform:uppercase;letter-spacing:0.4px;}
+  label:first-of-type{margin-top:0;}
+  input,select,textarea{
+    width:100%;
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    padding:11px 12px;
+    border:1px solid var(--line);
+    border-radius:9px;
+    background:var(--paper);
+    color:var(--ink);
+    min-height:44px;
+  }
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--orange);outline-offset:-1px;}
+  textarea{resize:vertical;min-height:64px;}
+  .field-row{display:flex;gap:8px;}
+  .field-row > div{flex:1;min-width:0;}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:15px;margin-bottom:14px;}
+  .card h4{font-family:'Barlow Condensed',sans-serif;font-size:15px;text-transform:uppercase;letter-spacing:0.4px;margin:0 0 2px;}
+
+  /* line items */
+  .lineitem{border-top:1px dashed var(--line);padding-top:10px;margin-top:10px;}
+  .lineitem:first-child{border-top:none;padding-top:0;margin-top:0;}
+  .li-row1{display:flex;gap:8px;}
+  .li-row1 input{min-width:0;}
+  .li-row2{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap;}
+  .li-qty{flex:0 1 70px;min-width:56px;}
+  .li-rate{flex:1 1 90px;min-width:70px;}
+  .li-remove{background:none;border:none;color:var(--danger);cursor:pointer;padding:8px;flex-shrink:0;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;}
+  .li-sub{font-family:'DM Mono',monospace;font-size:13px;color:var(--slate);white-space:nowrap;padding-left:4px;margin-left:auto;flex-shrink:0;}
+  .add-line{
+    display:flex;align-items:center;gap:6px;
+    background:none;border:1.5px dashed var(--slate-light);color:var(--steel);
+    border-radius:9px;padding:10px;width:100%;font-weight:600;font-size:13.5px;
+    margin-top:12px;cursor:pointer;
+  }
+
+  .totals{margin-top:4px;}
+  .totals-row{display:flex;justify-content:space-between;font-size:13.5px;padding:5px 0;color:var(--slate);}
+  .totals-row.grand{border-top:1px solid var(--line);margin-top:4px;padding-top:9px;font-size:18px;font-weight:700;color:var(--ink);font-family:'Barlow Condensed',sans-serif;}
+
+  .chip-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+  .chip{
+    padding:6px 13px;border-radius:20px;border:1px solid var(--line);
+    background:var(--paper);font-size:12.5px;font-weight:600;color:var(--slate);cursor:pointer;
+  }
+  .chip.active{background:var(--charcoal);color:#fff;border-color:var(--charcoal);}
+
+  .search-bar{
+    display:flex;align-items:center;gap:8px;
+    background:var(--paper);border:1px solid var(--line);border-radius:10px;
+    padding:9px 12px;margin-bottom:14px;
+  }
+  .search-bar input{border:none;padding:0;font-size:14px;}
+  .search-bar input:focus{outline:none;}
+  .search-bar svg{width:17px;height:17px;color:var(--slate-light);flex-shrink:0;}
+
+  /* invoice detail */
+  .doc{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px;}
+  .doc-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--charcoal);padding-bottom:14px;margin-bottom:14px;}
+  .doc-head .bizname{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:19px;}
+  .doc-head .biz-sub{font-size:11.5px;color:var(--slate);margin-top:2px;line-height:1.5;}
+  .doc-head .doctag{text-align:right;}
+  .doc-head .doctag .t{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;}
+  .doc-head .doctag .n{font-family:'DM Mono',monospace;font-size:12px;color:var(--slate);margin-top:2px;}
+  .doc-block{display:flex;justify-content:space-between;gap:12px;margin-bottom:14px;font-size:12.5px;}
+  .doc-block .lbl{color:var(--slate-light);text-transform:uppercase;font-size:10px;font-weight:700;letter-spacing:0.4px;margin-bottom:3px;}
+  .doc-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:10px;}
+  .doc-table th{text-align:left;font-size:10px;text-transform:uppercase;color:var(--slate-light);border-bottom:1px solid var(--line);padding-bottom:6px;font-weight:700;letter-spacing:0.3px;}
+  .doc-table td{padding:8px 0;border-bottom:1px solid #F0EEE7;vertical-align:top;}
+  .doc-table td.num{text-align:right;font-family:'DM Mono',monospace;white-space:nowrap;}
+  .doc-notes{font-size:12px;color:var(--slate);background:var(--concrete);border-radius:8px;padding:10px 12px;margin-top:10px;}
+
+  /* toast */
+  #toast{
+    position:fixed;left:50%;bottom:100px;transform:translateX(-50%);
+    background:var(--charcoal);color:#fff;padding:11px 18px;border-radius:30px;
+    font-size:13px;font-weight:600;box-shadow:0 8px 20px rgba(0,0,0,0.25);
+    opacity:0;pointer-events:none;transition:opacity 0.2s, bottom 0.2s;z-index:100;
+  }
+  #toast.show{opacity:1;bottom:112px;}
+
+  .qb-box{border:1px solid var(--line);border-radius:12px;padding:15px;background:var(--paper);}
+  .qb-logo{display:flex;align-items:center;gap:9px;}
+  .qb-logo .sq{width:34px;height:34px;border-radius:8px;background:#2CA01C;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;}
+  .note{font-size:12px;color:var(--slate);line-height:1.55;background:var(--concrete);border-radius:8px;padding:10px 12px;margin-top:10px;}
+  .swatch-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
+  .dealership-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid #F0EEE7;}
+  .dealership-row:last-child{border-bottom:none;}
+  .dealership-row .dn{font-weight:600;font-size:14px;}
+  .dealership-row .da{font-size:11.5px;color:var(--slate);}
+  .iconbtn-sm{background:none;border:none;color:var(--slate);cursor:pointer;padding:8px;min-width:36px;min-height:36px;}
+
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(15,16,20,0.55);
+    display:flex;align-items:flex-end;justify-content:center;
+    z-index:200;padding:0;
+  }
+  .modal-card{
+    background:var(--paper);width:100%;max-width:440px;
+    border-radius:18px 18px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));
+    max-height:88vh;overflow-y:auto;
+  }
+  .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+  .modal-head h3{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700;margin:0;text-transform:uppercase;letter-spacing:0.3px;}
+  .modal-sub{font-size:12px;color:var(--slate);margin:0 0 14px;}
+  .test-banner{
+    display:flex;align-items:flex-start;gap:8px;
+    background:var(--warning-bg);color:var(--warning);
+    border-radius:9px;padding:9px 11px;font-size:11.5px;line-height:1.5;margin-bottom:14px;
+  }
+  .field-note{font-size:11px;color:var(--slate-light);margin:4px 0 0;}
+  .preview-body{
+    white-space:pre-wrap;font-size:13px;line-height:1.6;background:var(--concrete);
+    border-radius:9px;padding:11px 12px;color:var(--ink);
+  }
+</style>
+</head>
+<body>
+<div id="shell">
+  <header class="topbar">
+    <div class="brandrow">
+      <div class="brand"><span class="mark">MB</span><span class="name">Mobile Business</span></div>
+      <button class="icon-btn" id="settingsShortcut" aria-label="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </button>
+    </div>
+    <div id="headerTitleBlock">
+      <div class="screen-title">Dashboard</div>
+      <p class="screen-sub">Here's how things stand today.</p>
+    </div>
+  </header>
+
+  <main id="screen"></main>
+
+  <div class="fab" id="fab" style="display:none;">
+    <button id="fabBtn" aria-label="New invoice">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    </button>
+  </div>
+
+  <nav class="tabbar">
+    <button data-tab="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+      Home
+    </button>
+    <button data-tab="invoices">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="8" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="16" y2="17"></line></svg>
+      Invoices
+    </button>
+    <button data-tab="new">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+      New
+    </button>
+    <button data-tab="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      Settings
+    </button>
+  </nav>
+  <div class="modal-overlay" id="emailModalOverlay" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-head"><h3>Email preview</h3><button class="icon-btn" id="emailModalClose" aria-label="Close" style="background:none;border:none;color:var(--slate);width:auto;height:auto;">&#10005;</button></div>
+      <p class="modal-sub">Check the message before it leaves the app.</p>
+      <div class="test-banner" id="emailTestBanner"></div>
+      <label style="margin-top:0;">To</label>
+      <input id="em_to" placeholder="dealer@example.com">
+      <label>Subject</label>
+      <input id="em_subject">
+      <label>Message</label>
+      <textarea id="em_body" style="min-height:140px;"></textarea>
+      <p class="field-note">Attach the downloaded PDF once your mail app opens &mdash; this app can't attach files automatically.</p>
+      <div class="row-btns" style="margin-top:16px;">
+        <button class="btn btn-outline" id="emailCopyBtn">Copy text</button>
+        <button class="btn btn-primary" id="emailOpenBtn">Open in mail app</button>
+      </div>
+      <button class="btn btn-ghost" id="emailSendTestBtn" style="margin-top:8px;">Send a test copy to myself</button>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+(function(){
+
+/* ---------------- storage helpers ---------------- */
+/* Uses Claude's window.storage when this runs inside a Claude.ai artifact.
+   Falls back to the browser's own localStorage when the file is opened
+   directly (downloaded, saved to home screen, etc). Falls back to an
+   in-memory store only if neither is available, in which case data will
+   not survive a reload. */
+const LS_PREFIX = 'mobile-business:';
+let memoryStore = {};
+let storageBackend = 'memory';
+
+function detectBackend(){
+  if(window.storage && typeof window.storage.get === 'function' && typeof window.storage.set === 'function'){
+    return 'cloud';
+  }
+  try{
+    const testKey = '__mb_test__';
+    localStorage.setItem(testKey, '1');
+    localStorage.removeItem(testKey);
+    return 'local';
+  }catch(e){
+    return 'memory';
+  }
+}
+
+async function storeGet(key, fallback){
+  if(storageBackend === 'cloud'){
+    try{
+      const r = await window.storage.get(key, false);
+      return r ? JSON.parse(r.value) : fallback;
+    }catch(e){ return fallback; }
+  }
+  if(storageBackend === 'local'){
+    try{
+      const raw = localStorage.getItem(LS_PREFIX + key);
+      return raw === null ? fallback : JSON.parse(raw);
+    }catch(e){ return fallback; }
+  }
+  return (key in memoryStore) ? memoryStore[key] : fallback;
+}
+async function storeSet(key, value){
+  if(storageBackend === 'cloud'){
+    try{
+      const result = await window.storage.set(key, JSON.stringify(value), false);
+      if(!result) console.error('cloud storage set returned no result for', key);
+    }catch(e){ console.error('cloud storage set failed', key, e); }
+    return;
+  }
+  if(storageBackend === 'local'){
+    try{ localStorage.setItem(LS_PREFIX + key, JSON.stringify(value)); }
+    catch(e){ console.error('local storage set failed', key, e); }
+    return;
+  }
+  memoryStore[key] = value;
+}
+
+/* ---------------- state ---------------- */
+let state = {
+  business: { name:'', owner:'', address:'', city:'', phone:'', email:'', notes:'' },
+  dealerships: [],
+  invoices: [],
+  qb: { connected:false, clientId:'', realmId:'' }
+};
+let currentTab = 'dashboard';
+let invoiceFilter = 'all';
+let draftInvoice = null;
+let editingDealership = null;
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function fmtMoney(n){ return '$' + (Math.round((n||0)*100)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtDate(iso){ if(!iso) return ''; const d = new Date(iso+'T00:00:00'); return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function addDays(iso, n){ const d = new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+
+function calcTotals(inv){
+  const items = inv.items || [];
+  const subtotal = items.reduce((s,it)=> s + (Number(it.qty)||0) * (Number(it.rate)||0), 0);
+  const taxRate = Number(inv.taxRate)||0;
+  const tax = subtotal * (taxRate/100);
+  const total = subtotal + tax;
+  return { subtotal, tax, total };
+}
+
+function invoiceStatusDisplay(inv){
+  if(inv.status === 'paid') return 'paid';
+  if(inv.status === 'draft') return 'draft';
+  if(inv.status === 'sent'){
+    if(inv.dueDate && inv.dueDate < todayISO()) return 'overdue';
+    return 'sent';
+  }
+  return inv.status || 'draft';
+}
+
+function dealershipName(id){
+  const d = state.dealerships.find(x=>x.id===id);
+  return d ? d.name : 'No dealership selected';
+}
+function dealershipById(id){ return state.dealerships.find(x=>x.id===id); }
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._tm);
+  toast._tm = setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+function nextInvoiceNumber(){
+  const n = state.invoices.length + 1;
+  return 'INV-' + String(n).padStart(4,'0');
+}
+
+/* ---------------- persistence ---------------- */
+async function loadAll(){
+  state.business = await storeGet('mb-business', state.business);
+  state.dealerships = await storeGet('mb-dealerships', []);
+  state.invoices = await storeGet('mb-invoices', []);
+  state.qb = await storeGet('mb-qb', state.qb);
+}
+async function persistInvoices(){ await storeSet('mb-invoices', state.invoices); }
+async function persistDealerships(){ await storeSet('mb-dealerships', state.dealerships); }
+async function persistBusiness(){ await storeSet('mb-business', state.business); }
+async function persistQB(){ await storeSet('mb-qb', state.qb); }
+
+/* ---------------- header ---------------- */
+function setHeader(title, sub){
+  document.getElementById('headerTitleBlock').innerHTML =
+    '<div class="screen-title">'+title+'</div><p class="screen-sub">'+sub+'</p>';
+}
+
+/* ---------------- router ---------------- */
+function goTab(tab){
+  currentTab = tab;
+  draftInvoice = null;
+  document.querySelectorAll('.tabbar button').forEach(b=> b.classList.toggle('active', b.dataset.tab===tab));
+  document.getElementById('fab').style.display = (tab==='invoices') ? 'flex' : 'none';
+  render();
+  document.getElementById('screen').scrollTop = 0;
+  window.scrollTo(0,0);
+}
+
+function render(){
+  if(currentTab==='dashboard') renderDashboard();
+  else if(currentTab==='invoices') renderInvoiceList();
+  else if(currentTab==='new') renderInvoiceForm();
+  else if(currentTab==='settings') renderSettings();
+  else if(currentTab==='detail') renderInvoiceDetail();
+  else if(currentTab==='dealerships') renderDealerships();
+}
+
+/* ---------------- icons (inline, small helper) ---------------- */
+const ICON = {
+  file:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+  chevron:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="9 18 15 12 9 6"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><polyline points="15 18 9 12 15 6"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>',
+  pdf:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><path d="M4 4h16v16H4z"/><polyline points="22,6 12,13 2,6"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+  building:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><path d="M6 22V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v18"/><path d="M2 22h20"/><path d="M9 8h1"/><path d="M14 8h1"/><path d="M9 12h1"/><path d="M14 12h1"/><path d="M9 16h1"/><path d="M14 16h1"/></svg>'
+};
+
+/* ---------------- DASHBOARD ---------------- */
+function renderDashboard(){
+  setHeader('Dashboard', "Here's how things stand today.");
+  const outstanding = state.invoices.filter(i=>i.status==='sent').reduce((s,i)=>s+calcTotals(i).total,0);
+  const paidThisMonth = state.invoices.filter(i=>{
+    if(i.status!=='paid' || !i.paidDate) return false;
+    const d = new Date(i.paidDate+'T00:00:00'); const now = new Date();
+    return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+  }).reduce((s,i)=>s+calcTotals(i).total,0);
+  const draftCount = state.invoices.filter(i=>i.status==='draft').length;
+  const overdueCount = state.invoices.filter(i=> invoiceStatusDisplay(i)==='overdue').length;
+
+  const recent = [...state.invoices].sort((a,b)=> (b.date||'').localeCompare(a.date||'')).slice(0,4);
+
+  let html = '';
+  html += '<div class="metrics">';
+  html += metricCard('Outstanding', fmtMoney(outstanding));
+  html += metricCard('Paid this month', fmtMoney(paidThisMonth));
+  html += metricCard('Draft invoices', draftCount);
+  html += metricCard('Overdue', overdueCount);
+  html += '</div>';
+
+  html += '<div class="section-head"><h3>Recent invoices</h3><button class="link-btn" id="seeAllBtn">See all</button></div>';
+  if(recent.length===0){
+    html += emptyState('No invoices yet', 'Create your first invoice to bill a dealership.', 'new');
+  } else {
+    recent.forEach(inv=> html += ticketHTML(inv));
+  }
+
+  document.getElementById('screen').innerHTML = html;
+  document.getElementById('seeAllBtn').onclick = ()=> goTab('invoices');
+  bindTicketClicks();
+  bindEmptyCta();
+}
+function metricCard(label, value){
+  return '<div class="metric"><div class="label">'+label+'</div><div class="value">'+value+'</div></div>';
+}
+
+/* ---------------- INVOICE LIST ---------------- */
+function renderInvoiceList(){
+  setHeader('Invoices', state.invoices.length + ' total');
+  let html = '';
+  html += '<div class="search-bar">'+ICON.search+'<input id="invSearch" placeholder="Search dealership or invoice #"></div>';
+  html += '<div class="chip-row">';
+  [['all','All'],['draft','Draft'],['sent','Sent'],['overdue','Overdue'],['paid','Paid']].forEach(([k,l])=>{
+    html += '<button class="chip'+(invoiceFilter===k?' active':'')+'" data-filter="'+k+'">'+l+'</button>';
+  });
+  html += '</div>';
+  html += '<div id="invListWrap"></div>';
+  document.getElementById('screen').innerHTML = html;
+  document.querySelectorAll('.chip').forEach(c=> c.onclick = ()=>{ invoiceFilter = c.dataset.filter; renderInvoiceListItems(); document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active', x.dataset.filter===invoiceFilter)); });
+  document.getElementById('invSearch').oninput = renderInvoiceListItems;
+  renderInvoiceListItems();
+}
+function renderInvoiceListItems(){
+  const q = (document.getElementById('invSearch')?.value || '').toLowerCase();
+  let list = [...state.invoices].sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+  if(invoiceFilter!=='all') list = list.filter(i=> invoiceStatusDisplay(i)===invoiceFilter);
+  if(q) list = list.filter(i=> (dealershipName(i.dealershipId).toLowerCase().includes(q) || i.number.toLowerCase().includes(q)));
+  const wrap = document.getElementById('invListWrap');
+  if(list.length===0){
+    wrap.innerHTML = emptyState('No invoices found', 'Try a different filter or search term.', null);
+  } else {
+    wrap.innerHTML = list.map(ticketHTML).join('');
+  }
+  bindTicketClicks();
+}
+function ticketHTML(inv){
+  const t = calcTotals(inv);
+  const status = invoiceStatusDisplay(inv);
+  const dn = dealershipName(inv.dealershipId);
+  return '<div class="ticket" data-id="'+inv.id+'">'
+    +'<div class="ticket-top">'
+      +'<div><div class="ticket-num">'+inv.number+' &middot; '+fmtDate(inv.date)+'</div>'
+      +'<div class="ticket-name">'+dn+'</div>'
+      +'<div class="ticket-meta">Due '+fmtDate(inv.dueDate)+'</div></div>'
+      +'<div class="ticket-amt">'+fmtMoney(t.total)+'</div>'
+    +'</div>'
+    +'<span class="stamp '+status+'">'+status+'</span>'
+  +'</div>';
+}
+function emptyState(big, sub, ctaTab){
+  return '<div class="empty">'+ICON.file
+    +'<p class="big">'+big+'</p><p>'+sub+'</p>'
+    + (ctaTab ? '<div style="margin-top:14px;"><button class="btn btn-primary" style="width:auto;padding:10px 18px;" data-empty-cta="'+ctaTab+'">Create invoice</button></div>' : '')
+  +'</div>';
+}
+function bindEmptyCta(){
+  document.querySelectorAll('[data-empty-cta]').forEach(b=> b.onclick = ()=> goTab(b.dataset.emptyCta));
+}
+function bindTicketClicks(){
+  document.querySelectorAll('.ticket').forEach(t=> t.onclick = ()=> openInvoiceDetail(t.dataset.id));
+  bindEmptyCta();
+}
+
+/* ---------------- NEW / EDIT INVOICE FORM ---------------- */
+function blankInvoice(){
+  return {
+    id: uid(),
+    number: nextInvoiceNumber(),
+    dealershipId: state.dealerships[0]?.id || '',
+    date: todayISO(),
+    dueDate: addDays(todayISO(), 15),
+    items: [{ id: uid(), desc:'', qty:1, rate:0 }],
+    taxRate: 0,
+    notes: '',
+    status: 'draft'
+  };
+}
+function renderInvoiceForm(){
+  if(!draftInvoice) draftInvoice = blankInvoice();
+  setHeader(draftInvoice._editing ? 'Edit invoice' : 'New invoice', 'Bill a dealership for completed work.');
+
+  if(state.dealerships.length===0){
+    document.getElementById('screen').innerHTML = emptyState('Add a dealership first', 'You need at least one dealership on file before creating an invoice.', null)
+      .replace('</div>', '<div style="margin-top:14px;"><button class="btn btn-primary" style="width:auto;padding:10px 18px;" id="goDealershipsBtn">Add dealership</button></div></div>');
+    document.getElementById('goDealershipsBtn').onclick = ()=>{ currentTab='dealerships'; render(); };
+    return;
+  }
+
+  let html = '<div class="card">';
+  html += '<label>Dealership</label><select id="f_dealership">';
+  state.dealerships.forEach(d=> html += '<option value="'+d.id+'"'+(d.id===draftInvoice.dealershipId?' selected':'')+'>'+d.name+'</option>');
+  html += '</select>';
+
+  html += '<div class="field-row"><div><label>Invoice #</label><input id="f_number" value="'+draftInvoice.number+'"></div>'
+        + '<div><label>Tax rate %</label><input id="f_tax" type="number" step="0.01" min="0" value="'+draftInvoice.taxRate+'"></div></div>';
+
+  html += '<div class="field-row"><div><label>Invoice date</label><input id="f_date" type="date" value="'+draftInvoice.date+'"></div>'
+        + '<div><label>Due date</label><input id="f_due" type="date" value="'+draftInvoice.dueDate+'"></div></div>';
+  html += '</div>';
+
+  html += '<div class="card"><h4>Line items</h4><div id="lineItemsWrap"></div>'
+        + '<button class="add-line" id="addLineBtn">'+ICON.plus+' Add line item</button></div>';
+
+  html += '<div class="card"><label style="margin-top:0;">Notes for the dealership</label><textarea id="f_notes" placeholder="Terms, PO reference, thank-you note...">'+ (draftInvoice.notes||'') +'</textarea></div>';
+
+  html += '<div class="card"><div class="totals" id="totalsWrap"></div></div>';
+
+  html += '<div class="row-btns" style="margin-top:6px;">'
+        + '<button class="btn btn-outline" id="saveDraftBtn">Save draft</button>'
+        + '<button class="btn btn-primary" id="saveSendBtn">Save &amp; mark sent</button>'
+        + '</div>';
+
+  document.getElementById('screen').innerHTML = html;
+  renderLineItems();
+  renderTotals();
+
+  document.getElementById('f_dealership').onchange = e=> draftInvoice.dealershipId = e.target.value;
+  document.getElementById('f_number').oninput = e=> draftInvoice.number = e.target.value;
+  document.getElementById('f_tax').oninput = e=>{ draftInvoice.taxRate = parseFloat(e.target.value)||0; renderTotals(); };
+  document.getElementById('f_date').onchange = e=> draftInvoice.date = e.target.value;
+  document.getElementById('f_due').onchange = e=> draftInvoice.dueDate = e.target.value;
+  document.getElementById('f_notes').oninput = e=> draftInvoice.notes = e.target.value;
+  document.getElementById('addLineBtn').onclick = ()=>{ draftInvoice.items.push({id:uid(),desc:'',qty:1,rate:0}); renderLineItems(); renderTotals(); };
+  document.getElementById('saveDraftBtn').onclick = ()=> saveInvoice('draft');
+  document.getElementById('saveSendBtn').onclick = ()=> saveInvoice('sent');
+}
+function renderLineItems(){
+  const wrap = document.getElementById('lineItemsWrap');
+  wrap.innerHTML = draftInvoice.items.map((it,idx)=>{
+    const sub = (Number(it.qty)||0)*(Number(it.rate)||0);
+    return '<div class="lineitem" data-idx="'+idx+'">'
+      +'<div class="li-row1"><input class="li-desc" placeholder="Description of work" value="'+(it.desc||'').replace(/"/g,'&quot;')+'">'
+      + (draftInvoice.items.length>1 ? '<button class="li-remove" data-idx="'+idx+'">'+ICON.trash+'</button>' : '')
+      +'</div>'
+      +'<div class="li-row2">'
+        +'<input class="li-qty" type="number" min="0" step="0.5" value="'+it.qty+'" placeholder="Qty">'
+        +'<input class="li-rate" type="number" min="0" step="0.01" value="'+it.rate+'" placeholder="Rate">'
+        +'<span class="li-sub">'+fmtMoney(sub)+'</span>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+  wrap.querySelectorAll('.lineitem').forEach(row=>{
+    const idx = parseInt(row.dataset.idx);
+    row.querySelector('.li-desc').oninput = e=>{ draftInvoice.items[idx].desc = e.target.value; };
+    row.querySelector('.li-qty').oninput = e=>{ draftInvoice.items[idx].qty = e.target.value; updateLineSub(row, idx); renderTotals(); };
+    row.querySelector('.li-rate').oninput = e=>{ draftInvoice.items[idx].rate = e.target.value; updateLineSub(row, idx); renderTotals(); };
+    const rm = row.querySelector('.li-remove');
+    if(rm) rm.onclick = ()=>{ draftInvoice.items.splice(idx,1); renderLineItems(); renderTotals(); };
+  });
+}
+function updateLineSub(row, idx){
+  const it = draftInvoice.items[idx];
+  row.querySelector('.li-sub').textContent = fmtMoney((Number(it.qty)||0)*(Number(it.rate)||0));
+}
+function renderTotals(){
+  const t = calcTotals(draftInvoice);
+  document.getElementById('totalsWrap').innerHTML =
+    '<div class="totals-row"><span>Subtotal</span><span>'+fmtMoney(t.subtotal)+'</span></div>'
+    +'<div class="totals-row"><span>Tax ('+(draftInvoice.taxRate||0)+'%)</span><span>'+fmtMoney(t.tax)+'</span></div>'
+    +'<div class="totals-row grand"><span>Total due</span><span>'+fmtMoney(t.total)+'</span></div>';
+}
+async function saveInvoice(status){
+  if(!draftInvoice.dealershipId){ toast('Choose a dealership first'); return; }
+  draftInvoice.items = draftInvoice.items.filter(it=> (it.desc && it.desc.trim()) || Number(it.qty) || Number(it.rate));
+  if(draftInvoice.items.length===0){ toast('Add at least one line item'); return; }
+  draftInvoice.status = status;
+  const idx = state.invoices.findIndex(i=>i.id===draftInvoice.id);
+  if(idx>=0) state.invoices[idx] = draftInvoice; else state.invoices.push(draftInvoice);
+  await persistInvoices();
+  toast(status==='sent' ? 'Invoice saved and marked sent' : 'Draft saved');
+  const savedId = draftInvoice.id;
+  draftInvoice = null;
+  openInvoiceDetail(savedId);
+}
+
+/* ---------------- INVOICE DETAIL ---------------- */
+let detailInvoiceId = null;
+function openInvoiceDetail(id){
+  detailInvoiceId = id;
+  currentTab = 'detail';
+  document.querySelectorAll('.tabbar button').forEach(b=> b.classList.remove('active'));
+  document.getElementById('fab').style.display = 'none';
+  render();
+  window.scrollTo(0,0);
+}
+function renderInvoiceDetail(){
+  const inv = state.invoices.find(i=>i.id===detailInvoiceId);
+  if(!inv){ goTab('invoices'); return; }
+  const t = calcTotals(inv);
+  const status = invoiceStatusDisplay(inv);
+  const dealer = dealershipById(inv.dealershipId);
+  const biz = state.business;
+
+  setHeader(inv.number, dealershipName(inv.dealershipId));
+
+  let html = '<button class="link-btn" id="backBtn" style="display:flex;align-items:center;gap:4px;margin-bottom:12px;">'+ICON.back+' Back to invoices</button>';
+
+  html += '<div class="doc">';
+  html += '<div class="doc-head">'
+    + '<div><div class="bizname">'+(biz.name || 'Your business')+'</div>'
+    + '<div class="biz-sub">'+[biz.address, biz.city].filter(Boolean).join('<br>')+'</div>'
+    + '<div class="biz-sub">'+[biz.phone, biz.email].filter(Boolean).join(' &middot; ')+'</div></div>'
+    + '<div class="doctag"><div class="t">INVOICE</div><div class="n">'+inv.number+'</div>'
+    + '<span class="stamp '+status+'" style="margin-top:8px;">'+status+'</span></div>'
+    + '</div>';
+
+  html += '<div class="doc-block">'
+    + '<div><div class="lbl">Bill to</div><div>'+ (dealer? dealer.name : 'No dealership') +'</div>'
+    + (dealer && dealer.contact ? '<div style="color:var(--slate);">Attn: '+dealer.contact+'</div>' : '')
+    + (dealer && dealer.address ? '<div style="color:var(--slate);">'+dealer.address+'</div>' : '')
+    + '</div>'
+    + '<div style="text-align:right;"><div class="lbl">Date</div><div>'+fmtDate(inv.date)+'</div>'
+    + '<div class="lbl" style="margin-top:8px;">Due</div><div>'+fmtDate(inv.dueDate)+'</div></div>'
+    + '</div>';
+
+  html += '<table class="doc-table"><thead><tr><th>Description</th><th style="text-align:right;">Qty</th><th style="text-align:right;">Rate</th><th style="text-align:right;">Amount</th></tr></thead><tbody>';
+  inv.items.forEach(it=>{
+    html += '<tr><td>'+(it.desc||'—')+'</td><td class="num">'+it.qty+'</td><td class="num">'+fmtMoney(it.rate)+'</td><td class="num">'+fmtMoney((Number(it.qty)||0)*(Number(it.rate)||0))+'</td></tr>';
+  });
+  html += '</tbody></table>';
+
+  html += '<div class="totals">'
+    + '<div class="totals-row"><span>Subtotal</span><span>'+fmtMoney(t.subtotal)+'</span></div>'
+    + '<div class="totals-row"><span>Tax ('+(inv.taxRate||0)+'%)</span><span>'+fmtMoney(t.tax)+'</span></div>'
+    + '<div class="totals-row grand"><span>Total due</span><span>'+fmtMoney(t.total)+'</span></div>'
+    + '</div>';
+
+  if(inv.notes) html += '<div class="doc-notes">'+inv.notes.replace(/\n/g,'<br>')+'</div>';
+  html += '</div>';
+
+  html += '<div class="row-btns" style="margin-top:14px;">'
+    + '<button class="btn btn-dark" id="pdfBtn">'+ICON.pdf+' Download PDF</button>'
+    + '<button class="btn btn-outline" id="emailBtn">'+ICON.mail+' Email</button>'
+    + '</div>';
+
+  html += '<div class="row-btns" style="margin-top:8px;">';
+  if(status!=='paid') html += '<button class="btn btn-outline" id="markPaidBtn">'+ICON.check+' Mark as paid</button>';
+  html += '<button class="btn btn-outline" id="editBtn">Edit invoice</button>';
+  html += '</div>';
+
+  if(state.qb.connected){
+    html += '<div class="row-btns" style="margin-top:8px;"><button class="btn btn-outline" id="qbSyncBtn"><span class="swatch-dot" style="background:#2CA01C;"></span>Sync to QuickBooks</button></div>';
+  }
+
+  html += '<button class="btn btn-danger" id="deleteBtn" style="margin-top:8px;">'+ICON.trash+' Delete invoice</button>';
+
+  document.getElementById('screen').innerHTML = html;
+  document.getElementById('backBtn').onclick = ()=> goTab('invoices');
+  document.getElementById('pdfBtn').onclick = ()=> downloadInvoicePDF(inv);
+  document.getElementById('emailBtn').onclick = ()=> emailInvoice(inv, dealer);
+  document.getElementById('editBtn').onclick = ()=>{ draftInvoice = JSON.parse(JSON.stringify(inv)); draftInvoice._editing = true; currentTab='new'; render(); };
+  const mp = document.getElementById('markPaidBtn');
+  if(mp) mp.onclick = async ()=>{ inv.status='paid'; inv.paidDate = todayISO(); await persistInvoices(); toast('Marked as paid'); renderInvoiceDetail(); };
+  document.getElementById('deleteBtn').onclick = async ()=>{
+    if(!confirm('Delete this invoice? This cannot be undone.')) return;
+    state.invoices = state.invoices.filter(i=>i.id!==inv.id);
+    await persistInvoices();
+    toast('Invoice deleted');
+    goTab('invoices');
+  };
+  const qbBtn = document.getElementById('qbSyncBtn');
+  if(qbBtn) qbBtn.onclick = ()=> toast('Queued for QuickBooks sync (see Settings for connection details)');
+}
+
+/* ---------------- PDF ---------------- */
+function downloadInvoicePDF(inv){
+  if(!window.jspdf){ toast('PDF library still loading, try again'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'pt', format:'letter' });
+  const biz = state.business;
+  const dealer = dealershipById(inv.dealershipId);
+  const t = calcTotals(inv);
+  const marginX = 48;
+  let y = 56;
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(20);
+  doc.text(biz.name || 'Your Business', marginX, y);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(90,90,90);
+  y += 16;
+  [biz.address, biz.city, [biz.phone, biz.email].filter(Boolean).join('  |  ')].filter(Boolean).forEach(line=>{
+    doc.text(line, marginX, y); y += 12;
+  });
+
+  doc.setTextColor(20,20,20);
+  doc.setFont('helvetica','bold'); doc.setFontSize(18);
+  doc.text('INVOICE', 564, 56, { align:'right' });
+  doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(90,90,90);
+  doc.text(inv.number, 564, 72, { align:'right' });
+  doc.text('Status: ' + invoiceStatusDisplay(inv).toUpperCase(), 564, 86, { align:'right' });
+
+  y = Math.max(y, 96) + 14;
+  doc.setDrawColor(28,31,38); doc.setLineWidth(1.4);
+  doc.line(marginX, y, 564, y);
+  y += 22;
+
+  doc.setTextColor(140,140,140); doc.setFontSize(8); doc.setFont('helvetica','bold');
+  doc.text('BILL TO', marginX, y);
+  doc.text('DATE', 380, y);
+  doc.text('DUE DATE', 480, y);
+  y += 14;
+  doc.setTextColor(20,20,20); doc.setFontSize(11); doc.setFont('helvetica','normal');
+  doc.text(dealer ? dealer.name : 'Dealership', marginX, y);
+  doc.setFontSize(10);
+  doc.text(fmtDate(inv.date), 380, y);
+  doc.text(fmtDate(inv.dueDate), 480, y);
+  y += 14;
+  if(dealer && dealer.contact){ doc.text('Attn: ' + dealer.contact, marginX, y); y += 13; }
+  if(dealer && dealer.address){ doc.text(dealer.address, marginX, y); y += 13; }
+
+  y += 16;
+  doc.setDrawColor(220,220,220); doc.setLineWidth(0.7);
+  doc.line(marginX, y, 564, y);
+  y += 16;
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(140,140,140);
+  doc.text('DESCRIPTION', marginX, y);
+  doc.text('QTY', 380, y, { align:'right' });
+  doc.text('RATE', 460, y, { align:'right' });
+  doc.text('AMOUNT', 564, y, { align:'right' });
+  y += 10;
+  doc.setDrawColor(220,220,220);
+  doc.line(marginX, y, 564, y);
+  y += 14;
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(20,20,20);
+  inv.items.forEach(it=>{
+    const amt = (Number(it.qty)||0)*(Number(it.rate)||0);
+    const desc = doc.splitTextToSize(it.desc || '-', 300);
+    doc.text(desc, marginX, y);
+    doc.text(String(it.qty), 380, y, { align:'right' });
+    doc.text(fmtMoney(it.rate), 460, y, { align:'right' });
+    doc.text(fmtMoney(amt), 564, y, { align:'right' });
+    y += 14 * desc.length + 4;
+    doc.setDrawColor(240,240,240);
+    doc.line(marginX, y-4, 564, y-4);
+  });
+
+  y += 10;
+  doc.setFontSize(10);
+  doc.text('Subtotal', 460, y, { align:'right' }); doc.text(fmtMoney(t.subtotal), 564, y, { align:'right' }); y += 15;
+  doc.text('Tax (' + (inv.taxRate||0) + '%)', 460, y, { align:'right' }); doc.text(fmtMoney(t.tax), 564, y, { align:'right' }); y += 15;
+  doc.setDrawColor(28,31,38); doc.setLineWidth(1);
+  doc.line(400, y, 564, y); y += 16;
+  doc.setFont('helvetica','bold'); doc.setFontSize(13);
+  doc.text('Total due', 460, y, { align:'right' }); doc.text(fmtMoney(t.total), 564, y, { align:'right' });
+
+  if(inv.notes){
+    y += 34;
+    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(140,140,140);
+    doc.text('NOTES', marginX, y); y += 12;
+    doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(60,60,60);
+    const notesLines = doc.splitTextToSize(inv.notes, 516);
+    doc.text(notesLines, marginX, y);
+  }
+
+  doc.save(inv.number + '-' + (dealer?dealer.name.replace(/[^a-z0-9]/gi,'_'):'invoice') + '.pdf');
+  toast('PDF downloaded');
+}
+function buildEmailDraft(inv, dealer){
+  const t = calcTotals(inv);
+  const subject = 'Invoice ' + inv.number + ' from ' + (state.business.name||'Mobile Business');
+  const body =
+    'Hi' + (dealer && dealer.contact ? ' ' + dealer.contact : '') + ',\n\n' +
+    'Please find invoice ' + inv.number + ' for ' + fmtMoney(t.total) + ', due ' + fmtDate(inv.dueDate) + '.\n' +
+    'Download the PDF from the app and attach it to this email before sending.\n\n' +
+    'Thank you,\n' + (state.business.name||'');
+  const to = dealer && dealer.email ? dealer.email : '';
+  return { to, subject, body };
+}
+
+let emailModalMode = 'send';
+function emailInvoice(inv, dealer){
+  openEmailModal(inv, dealer, 'send');
+}
+function openEmailModal(inv, dealer, mode){
+  emailModalMode = mode || 'send';
+  const draft = buildEmailDraft(inv, dealer);
+  const overlay = document.getElementById('emailModalOverlay');
+  const banner = document.getElementById('emailTestBanner');
+  const sendTestBtn = document.getElementById('emailSendTestBtn');
+
+  if(emailModalMode === 'test'){
+    draft.to = state.business.email || '';
+    draft.subject = '[TEST] ' + draft.subject;
+    banner.innerHTML = '<span>&#9888;</span><span>Test mode: this points at your own business email ('+(state.business.email || 'add one in Settings')+') so nothing goes to the dealership. Use it to confirm the message reads correctly before sending for real.</span>';
+    banner.style.display = 'flex';
+    sendTestBtn.style.display = 'none';
+  } else {
+    banner.style.display = 'none';
+    banner.innerHTML = '';
+    sendTestBtn.style.display = 'block';
+  }
+
+  document.getElementById('em_to').value = draft.to;
+  document.getElementById('em_subject').value = draft.subject;
+  document.getElementById('em_body').value = draft.body;
+  overlay.dataset.invId = inv.id;
+  overlay.style.display = 'flex';
+}
+function closeEmailModal(){
+  document.getElementById('emailModalOverlay').style.display = 'none';
+}
+function currentEmailFields(){
+  return {
+    to: document.getElementById('em_to').value.trim(),
+    subject: document.getElementById('em_subject').value.trim(),
+    body: document.getElementById('em_body').value
+  };
+}
+function openMailClient(){
+  const f = currentEmailFields();
+  const href = 'mailto:' + encodeURIComponent(f.to) + '?subject=' + encodeURIComponent(f.subject) + '&body=' + encodeURIComponent(f.body);
+  window.location.href = href;
+  toast('Opening your mail app...');
+}
+async function copyEmailText(){
+  const f = currentEmailFields();
+  const text = 'To: ' + f.to + '\nSubject: ' + f.subject + '\n\n' + f.body;
+  try{
+    await navigator.clipboard.writeText(text);
+    toast('Email text copied');
+  }catch(e){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try{ document.execCommand('copy'); toast('Email text copied'); }
+    catch(e2){ toast('Could not copy automatically, select the text manually'); }
+    document.body.removeChild(ta);
+  }
+}
+document.getElementById('emailModalClose').onclick = closeEmailModal;
+document.getElementById('emailModalOverlay').addEventListener('click', function(e){ if(e.target===this) closeEmailModal(); });
+document.getElementById('emailOpenBtn').onclick = openMailClient;
+document.getElementById('emailCopyBtn').onclick = copyEmailText;
+document.getElementById('emailSendTestBtn').onclick = function(){
+  const inv = state.invoices.find(i=>i.id===document.getElementById('emailModalOverlay').dataset.invId);
+  const dealer = inv ? dealershipById(inv.dealershipId) : null;
+  if(!state.business.email){ toast('Add your business email in Settings first'); return; }
+  if(inv) openEmailModal(inv, dealer, 'test');
+};
+
+/* ---------------- DEALERSHIPS ---------------- */
+function renderDealerships(){
+  setHeader('Dealerships', 'Customers you bill for mobile services.');
+  let html = '<button class="btn btn-primary" id="addDealerBtn" style="margin-bottom:14px;">'+ICON.plus+' Add dealership</button>';
+  html += '<div class="card" id="dealerFormCard" style="display:none;"></div>';
+  html += '<div class="card" id="dealerListCard"><div id="dealerListWrap"></div></div>';
+  document.getElementById('screen').innerHTML = html;
+  renderDealerList();
+  document.getElementById('addDealerBtn').onclick = ()=> openDealerForm(null);
+}
+function renderDealerList(){
+  const wrap = document.getElementById('dealerListWrap');
+  if(state.dealerships.length===0){ wrap.innerHTML = '<p style="color:var(--slate);font-size:13px;text-align:center;padding:20px 0;">No dealerships yet. Add your first customer above.</p>'; return; }
+  wrap.innerHTML = state.dealerships.map(d=>
+    '<div class="dealership-row"><div><div class="dn">'+d.name+'</div><div class="da">'+[d.contact,d.city].filter(Boolean).join(' &middot; ')+'</div></div>'
+    +'<div><button class="iconbtn-sm" data-edit="'+d.id+'">Edit</button> <button class="iconbtn-sm" data-del="'+d.id+'" style="color:var(--danger);">'+ICON.trash+'</button></div></div>'
+  ).join('');
+  wrap.querySelectorAll('[data-edit]').forEach(b=> b.onclick = ()=> openDealerForm(b.dataset.edit));
+  wrap.querySelectorAll('[data-del]').forEach(b=> b.onclick = async ()=>{
+    if(!confirm('Remove this dealership?')) return;
+    state.dealerships = state.dealerships.filter(d=>d.id!==b.dataset.del);
+    await persistDealerships();
+    renderDealerList();
+  });
+}
+function openDealerForm(id){
+  const d = id ? dealershipById(id) : { id:uid(), name:'', contact:'', email:'', phone:'', address:'', city:'' };
+  const card = document.getElementById('dealerFormCard');
+  card.style.display = 'block';
+  card.innerHTML =
+    '<h4>'+(id?'Edit dealership':'New dealership')+'</h4>'
+    + '<label style="margin-top:8px;">Dealership name</label><input id="d_name" value="'+(d.name||'')+'" placeholder="Coastal Auto Group">'
+    + '<label>Contact name</label><input id="d_contact" value="'+(d.contact||'')+'" placeholder="Service manager name">'
+    + '<div class="field-row"><div><label>Email</label><input id="d_email" value="'+(d.email||'')+'" placeholder="billing@dealer.com"></div>'
+    + '<div><label>Phone</label><input id="d_phone" value="'+(d.phone||'')+'"></div></div>'
+    + '<label>Address</label><input id="d_address" value="'+(d.address||'')+'" placeholder="Street, city, state">'
+    + '<div class="row-btns" style="margin-top:14px;"><button class="btn btn-ghost" id="d_cancel">Cancel</button><button class="btn btn-primary" id="d_save">Save</button></div>';
+  document.getElementById('d_cancel').onclick = ()=>{ card.style.display='none'; card.innerHTML=''; };
+  document.getElementById('d_save').onclick = async ()=>{
+    d.name = document.getElementById('d_name').value.trim();
+    if(!d.name){ toast('Enter a dealership name'); return; }
+    d.contact = document.getElementById('d_contact').value.trim();
+    d.email = document.getElementById('d_email').value.trim();
+    d.phone = document.getElementById('d_phone').value.trim();
+    d.address = document.getElementById('d_address').value.trim();
+    const idx = state.dealerships.findIndex(x=>x.id===d.id);
+    if(idx>=0) state.dealerships[idx]=d; else state.dealerships.push(d);
+    await persistDealerships();
+    card.style.display='none'; card.innerHTML='';
+    renderDealerList();
+    toast('Dealership saved');
+  };
+}
+
+/* ---------------- SETTINGS ---------------- */
+function storageStatusCardHTML(){
+  let dot, label, note;
+  if(storageBackend === 'cloud'){
+    dot = 'var(--success)'; label = 'Saved to Claude';
+    note = 'Your data is stored by Claude.ai and will be here next time you open this app in a chat.';
+  } else if(storageBackend === 'local'){
+    dot = 'var(--success)'; label = 'Saved to this browser';
+    note = 'Your data is stored locally in this browser on this device. It will still be here next time you open this same file, but it will not follow you to a different browser, device, or private/incognito window.';
+  } else {
+    dot = 'var(--danger)'; label = 'Not being saved';
+    note = 'This browser is blocking storage (common in private/incognito mode or some in-app browsers). Changes will be lost when you close or reload the app. Try opening the downloaded file in a regular browser tab.';
+  }
+  return '<div class="card"><h4>Data storage</h4>'
+    + '<div style="display:flex;align-items:center;gap:7px;margin-top:8px;"><span class="swatch-dot" style="background:'+dot+';"></span><span style="font-weight:600;font-size:13.5px;">'+label+'</span></div>'
+    + '<p style="font-size:12px;color:var(--slate);line-height:1.55;margin:8px 0 0;">'+note+'</p>'
+    + '</div>';
+}
+function renderSettings(){
+  setHeader('Settings', 'Business profile, dealerships, integrations.');
+  const biz = state.business;
+  let html = '';
+
+  html += storageStatusCardHTML();
+
+  html += '<div class="card"><h4>Business profile</h4>'
+    + '<label style="margin-top:8px;">Business name</label><input id="s_name" value="'+(biz.name||'')+'" placeholder="Your business name">'
+    + '<label>Owner / operator</label><input id="s_owner" value="'+(biz.owner||'')+'">'
+    + '<label>Address</label><input id="s_address" value="'+(biz.address||'')+'" placeholder="Street address">'
+    + '<label>City, state, ZIP</label><input id="s_city" value="'+(biz.city||'')+'">'
+    + '<div class="field-row"><div><label>Phone</label><input id="s_phone" value="'+(biz.phone||'')+'"></div>'
+    + '<div><label>Email</label><input id="s_email" value="'+(biz.email||'')+'"></div></div>'
+    + '<button class="btn btn-primary" id="saveBizBtn" style="margin-top:14px;">Save profile</button>'
+    + '</div>';
+
+  html += '<div class="section-head"><h3>Dealerships</h3><button class="link-btn" id="manageDealersBtn">Manage</button></div>';
+  html += '<div class="card">' + (state.dealerships.length
+      ? state.dealerships.slice(0,4).map(d=>'<div class="dealership-row"><div><div class="dn">'+d.name+'</div><div class="da">'+(d.contact||'')+'</div></div></div>').join('')
+      : '<p style="color:var(--slate);font-size:13px;">No dealerships added yet.</p>') + '</div>';
+
+  html += '<div class="section-head"><h3>QuickBooks</h3></div>';
+  html += '<div class="qb-box" id="qbBox"></div>';
+
+  html += '<div class="section-head"><h3>Data</h3></div>';
+  html += '<div class="card"><button class="btn btn-danger" id="clearDataBtn">Clear all app data</button></div>';
+
+  document.getElementById('screen').innerHTML = html;
+  document.getElementById('saveBizBtn').onclick = async ()=>{
+    state.business = {
+      name: document.getElementById('s_name').value.trim(),
+      owner: document.getElementById('s_owner').value.trim(),
+      address: document.getElementById('s_address').value.trim(),
+      city: document.getElementById('s_city').value.trim(),
+      phone: document.getElementById('s_phone').value.trim(),
+      email: document.getElementById('s_email').value.trim()
+    };
+    await persistBusiness();
+    toast('Business profile saved');
+  };
+  document.getElementById('manageDealersBtn').onclick = ()=>{ currentTab='dealerships'; render(); };
+  document.getElementById('clearDataBtn').onclick = async ()=>{
+    if(!confirm('This deletes all invoices, dealerships, and settings from this app. Continue?')) return;
+    state = { business:{name:'',owner:'',address:'',city:'',phone:'',email:'',notes:''}, dealerships:[], invoices:[], qb:{connected:false,clientId:'',realmId:''} };
+    await Promise.all([persistBusiness(), persistDealerships(), persistInvoices(), persistQB()]);
+    toast('All data cleared');
+    render();
+  };
+  renderQBBox();
+}
+function renderQBBox(){
+  const box = document.getElementById('qbBox');
+  if(!box) return;
+  if(state.qb.connected){
+    box.innerHTML =
+      '<div class="qb-logo"><div class="sq">QB</div><div><div style="font-weight:600;font-size:14.5px;">Connected to QuickBooks</div>'
+      + '<div style="font-size:11.5px;color:var(--slate);">Company ID: '+(state.qb.realmId||'—')+'</div></div></div>'
+      + '<div class="note">Invoices marked "sent" can be queued for sync from the invoice screen. This connection is stored on this device only.</div>'
+      + '<button class="btn btn-outline" id="qbDisconnect" style="margin-top:12px;">Disconnect</button>';
+    document.getElementById('qbDisconnect').onclick = async ()=>{
+      state.qb = { connected:false, clientId:'', realmId:'' };
+      await persistQB();
+      renderQBBox();
+      toast('Disconnected from QuickBooks');
+    };
+  } else {
+    box.innerHTML =
+      '<div class="qb-logo"><div class="sq">QB</div><div><div style="font-weight:600;font-size:14.5px;">Not connected</div>'
+      + '<div style="font-size:11.5px;color:var(--slate);">Sync invoices and customers automatically.</div></div></div>'
+      + '<label style="margin-top:12px;">Intuit app client ID</label><input id="qb_client" placeholder="From your Intuit Developer app">'
+      + '<label>Company (realm) ID</label><input id="qb_realm" placeholder="Your QuickBooks company ID">'
+      + '<button class="btn btn-dark" id="qbConnectBtn" style="margin-top:12px;">Connect QuickBooks</button>'
+      + '<div class="note">Full QuickBooks sync requires a small backend: Intuit issues a confidential client secret that cannot be stored safely in a browser-only app, and it hosts the OAuth login and consent screen. This screen saves your IDs locally and marks the connection as active so the rest of the app (invoice sync button, status badges) is ready to wire up once that backend piece exists.</div>';
+    document.getElementById('qbConnectBtn').onclick = async ()=>{
+      const clientId = document.getElementById('qb_client').value.trim();
+      const realmId = document.getElementById('qb_realm').value.trim();
+      if(!clientId || !realmId){ toast('Enter both fields to continue'); return; }
+      state.qb = { connected:true, clientId, realmId };
+      await persistQB();
+      renderQBBox();
+      toast('QuickBooks connection saved');
+    };
+  }
+}
+
+/* ---------------- boot ---------------- */
+document.querySelectorAll('.tabbar button').forEach(b=> b.onclick = ()=> goTab(b.dataset.tab));
+document.getElementById('fabBtn').onclick = ()=> goTab('new');
+document.getElementById('settingsShortcut').onclick = ()=> goTab('settings');
+
+(async function init(){
+  storageBackend = detectBackend();
+  await loadAll();
+  goTab('dashboard');
+  if(storageBackend === 'memory'){
+    setTimeout(()=> toast('Warning: this browser is blocking storage, changes will not be saved after reload'), 600);
+  }
+})();
+
+})();
+</script>
+</body>
+</html>
